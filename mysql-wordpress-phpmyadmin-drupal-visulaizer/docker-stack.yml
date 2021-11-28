@@ -130,8 +130,8 @@ networks: #network tanımı yapıldı
 
 secrets:
     db-user:
-        file: ./home/eren/secrets/db-user.txt
+        file: ./home/eren/secrets/db-user.txte
     db-password:
-        file: ./home/eren/secrets/db-password.txt
+        file: ./home/eren/secrets/db-password.txte
     db-root-password:
-        file: ./home/eren/secrets/db-root-password.txt
+        file: ./home/eren/secrets/db-root-password.txte
