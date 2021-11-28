@@ -41,7 +41,7 @@ services:
     deploy:
         replicas: 5
         placement:
-            constraints: [node.hostname == node1]
+            constraints: [node.hostname == node3]
         restart_policy:
             condition: on-failure
         update_config:
