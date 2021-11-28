@@ -94,6 +94,7 @@ services:
       - /var/www/html/themes
       - /var/www/html/modules
       - /var/www/html/private
+    
     secrets:
         - db-user
         - db-password
