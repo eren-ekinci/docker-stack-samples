@@ -1,0 +1,119 @@
+version: '3'
+
+services:
+
+  # MYSQLDB
+  mysqldb:
+    image: mysql:5.7
+    volumes:
+      - db_data:/var/lib/mysql
+    deploy:
+        replicas: 1
+        restart_policy:
+            condition: on-failure
+        placement:
+            constraints: [node.hostname == node1]
+    environment:
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: sa
+      MYSQL_PASSWORD: birikiuc123!
+      MYSQL_ROOT_PASSWORD: birikiuc123!
+    networks:
+      - Backend
+    restart: always
+  
+  # WORDPRESS
+  wordpress:
+    image: wordpress:latest
+    depends_on: # bağımlılık belirtiyoruz. mysqldb servisi ayağa kalkmadan bu servisi çalıştırma
+      - mysqldb  
+    volumes:
+      - /var/www/html
+    ports:
+      - '1010:80'
+    environment:
+      WORDPRESS_DB_HOST: mysqldb:3306
+      WORDPRESS_DB_USER: sa
+      WORDPRESS_DB_PASSWORD: birikiuc123!
+      WORDPRESS_DB_NAME: wordpress
+    networks:
+      - Backend
+      - Frontend
+    deploy:
+        replicas: 5
+        placement:
+            constraints: [node.hostname == node1]
+        restart_policy:
+            condition: on-failure
+        update_config:
+            parallelism: 2
+            delay: 10s
+        resources:
+          limits:
+            cpus: '0.50'
+            memory: 50M
+          reservations:
+            cpus: '0.25'
+            memory: 20M
+    restart: always
+  
+  # PHPMYADMIN
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    depends_on:
+      - mysqldb
+    restart: always
+    ports:
+      - '7080:80'
+    environment:
+      PMA_HOST: mysqldb:3306
+      MYSQL_ROOT_PASSWORD: birikiuc123!
+    networks:
+      - Backend
+      - Frontend
+  
+  # DRUPAL
+  drupal:
+    image: drupal:8-apache
+    depends_on:
+      - mysqldb
+    ports:
+      - "2020:80"
+    volumes:
+      - /var/www/html/sites
+      - /var/www/html/profiles
+      - /var/www/html/themes
+      - /var/www/html/modules
+      - /var/www/html/private
+    environment:
+      MYSQL_DATABASE: DRUPAL
+      MYSQL_USER: sa
+      MYSQL_PASSWORD: birikiuc123!
+    networks:
+      - Backend
+      - Frontend
+    deploy:
+      replicas: 3
+    restart: always
+  
+  # VISUALIZER
+  visualizer:
+    image: dockersamples/visualizer:stable
+    ports:
+      - "8080:8080"
+    stop_grace_period: 1m30s
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - Backend
+      - Frontend
+    deploy:
+      placement:
+        constraints: [node.role == manager]
+    
+volumes: #volume tanımı yapıldı
+  db_data:
+
+networks: #network tanımı yapıldı
+  Backend
+  Frontend
