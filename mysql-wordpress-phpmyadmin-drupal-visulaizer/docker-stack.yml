@@ -3,10 +3,10 @@ version: '3'
 services:
 
   # MYSQLDB
-  mysqldb:
+mysqldb:
     image: mysql:5.7
     volumes:
-      - db_data:/var/lib/mysql
+         - db_data:/var/lib/mysql
     deploy:
         replicas: 1
         restart_policy:
@@ -19,16 +19,16 @@ services:
         - db-root-password
 
     environment:
-      MYSQL_DATABASE: wordpress
-      MYSQL_USER: /run/secrets/db-user.txt
-      MYSQL_PASSWORD: /run/secrets/db-password.txt
-      MYSQL_ROOT_PASSWORD: /run/secrets/db-root-password.txt
+        MYSQL_DATABASE: wordpress
+        MYSQL_USER: /run/secrets/db-user.txt
+        MYSQL_PASSWORD: /run/secrets/db-password.txt
+        MYSQL_ROOT_PASSWORD: /run/secrets/db-root-password.txt
 
     networks:
-      - Backend
+        - Backend
   
   # WORDPRESS
-  wordpress:
+wordpress:
     image: wordpress:latest
     depends_on: # bağımlılık belirtiyoruz. mysqldb servisi ayağa kalkmadan bu servisi çalıştırma
       - mysqldb  
@@ -40,10 +40,10 @@ services:
         - db-user
         - db-password
     environment:
-      WORDPRESS_DB_HOST: mysqldb:3306
-      WORDPRESS_DB_USER: /run/secrets/db-user.txt
-      WORDPRESS_DB_PASSWORD: /run/secrets/db-password.txt
-      WORDPRESS_DB_NAME: wordpress
+        WORDPRESS_DB_HOST: mysqldb:3306
+        WORDPRESS_DB_USER: /run/secrets/db-user.txt
+        WORDPRESS_DB_PASSWORD: /run/secrets/db-password.txt
+        WORDPRESS_DB_NAME: wordpress
     networks:
       - Backend
       - Frontend
@@ -65,7 +65,7 @@ services:
             memory: 20M
   
   # PHPMYADMIN
-  phpmyadmin:
+phpmyadmin:
     image: phpmyadmin/phpmyadmin
     depends_on:
       - mysqldb
@@ -82,7 +82,7 @@ services:
       - Frontend
   
   # DRUPAL
-  drupal:
+drupal:
     image: drupal:8-apache
     depends_on:
       - mysqldb
@@ -109,7 +109,7 @@ services:
       replicas: 3
   
   # VISUALIZER
-  visualizer:
+visualizer:
     image: dockersamples/visualizer:stable
     ports:
       - "8080:8080"
