@@ -72,10 +72,10 @@ services:
     ports:
       - '7080:80'
     secrets:
-        - db-root-password
+        - db-password
     environment:
       PMA_HOST: mysqldb:3306
-      MYSQL_ROOT_PASSWORD: /run/secrets/db-root-password.txt
+      MYSQL_ROOT_PASSWORD: /run/secrets/db-password.txt
     networks:
       - Backend
       - Frontend
