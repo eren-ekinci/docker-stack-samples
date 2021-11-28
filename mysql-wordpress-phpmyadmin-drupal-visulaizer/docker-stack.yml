@@ -123,17 +123,17 @@ services:
           placement:
             constraints: [node.role == manager]
     
-    volumes: #volume tanımı yapıldı
-      db_data:
+volumes: #volume tanımı yapıldı
+  db_data:
 
-    networks: #network tanımı yapıldı
-      Backend:
-      Frontend:
+networks: #network tanımı yapıldı
+     Backend:
+     Frontend:
 
-    secrets:
-        db-user:
+secrets:
+       db-user:
             file: /home/eren/secrets/db-user.txt
-        db-password:
-            file: /home/eren/secrets/db-password.txt
-        db-root-password:
-            file: /home/eren/secrets/db-root-password.txt
+       db-password:
+           file: /home/eren/secrets/db-password.txt
+       db-root-password:
+           file: /home/eren/secrets/db-root-password.txt
