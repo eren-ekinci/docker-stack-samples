@@ -3,137 +3,137 @@ version: '3'
 services:
 
   # MYSQLDB
-mysqldb:
-    image: mysql:5.7
-    volumes:
-         - db_data:/var/lib/mysql
-    deploy:
-        replicas: 1
-        restart_policy:
-            condition: on-failure
-        placement:
-            constraints: [node.hostname == node1]
-    secrets:
-        - db-user
-        - db-password
-        - db-root-password
+    mysqldb:
+        image: mysql:5.7
+        volumes:
+            - db_data:/var/lib/mysql
+        deploy:
+            replicas: 1
+            restart_policy:
+                condition: on-failure
+            placement:
+                constraints: [node.hostname == node1]
+        secrets:
+            - db-user
+            - db-password
+            - db-root-password
 
-    environment:
-        MYSQL_DATABASE: wordpress
-        MYSQL_USER: /run/secrets/db-user.txt
-        MYSQL_PASSWORD: /run/secrets/db-password.txt
-        MYSQL_ROOT_PASSWORD: /run/secrets/db-root-password.txt
+        environment:
+            MYSQL_DATABASE: wordpress
+            MYSQL_USER: /run/secrets/db-user.txt
+            MYSQL_PASSWORD: /run/secrets/db-password.txt
+            MYSQL_ROOT_PASSWORD: /run/secrets/db-root-password.txt
 
-    networks:
-        - Backend
+        networks:
+            - Backend
   
   # WORDPRESS
-wordpress:
-    image: wordpress:latest
-    depends_on: # bağımlılık belirtiyoruz. mysqldb servisi ayağa kalkmadan bu servisi çalıştırma
-      - mysqldb  
-    volumes:
-      - /var/www/html
-    ports:
-      - '1010:80'
-    secrets:
-        - db-user
-        - db-password
-    environment:
-        WORDPRESS_DB_HOST: mysqldb:3306
-        WORDPRESS_DB_USER: /run/secrets/db-user.txt
-        WORDPRESS_DB_PASSWORD: /run/secrets/db-password.txt
-        WORDPRESS_DB_NAME: wordpress
-    networks:
-      - Backend
-      - Frontend
-    deploy:
-        replicas: 5
-        placement:
-            constraints: [node.role == worker]
-        restart_policy:
-            condition: on-failure
-        update_config:
-            parallelism: 2
-            delay: 10s
-        resources:
-          limits:
-            cpus: '0.25'
-            memory: 50M
-          reservations:
-            cpus: '0.25'
-            memory: 20M
+    wordpress:
+        image: wordpress:latest
+        depends_on: # bağımlılık belirtiyoruz. mysqldb servisi ayağa kalkmadan bu servisi çalıştırma
+          - mysqldb  
+        volumes:
+          - /var/www/html
+        ports:
+          - '1010:80'
+        secrets:
+            - db-user
+            - db-password
+        environment:
+            WORDPRESS_DB_HOST: mysqldb:3306
+            WORDPRESS_DB_USER: /run/secrets/db-user.txt
+            WORDPRESS_DB_PASSWORD: /run/secrets/db-password.txt
+            WORDPRESS_DB_NAME: wordpress
+        networks:
+          - Backend
+          - Frontend
+        deploy:
+            replicas: 5
+            placement:
+                constraints: [node.role == worker]
+            restart_policy:
+                condition: on-failure
+            update_config:
+                parallelism: 2
+                delay: 10s
+            resources:
+              limits:
+                cpus: '0.25'
+                memory: 50M
+              reservations:
+                cpus: '0.25'
+                memory: 20M
   
-  # PHPMYADMIN
-phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    depends_on:
-      - mysqldb
-    ports:
-      - '7080:80'
+      # PHPMYADMIN
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        depends_on:
+          - mysqldb
+        ports:
+          - '7080:80'
     
-    secrets:
-        - db-root-password
-    environment:
-      PMA_HOST: mysqldb:3306
-      MYSQL_ROOT_PASSWORD: /run/secrets/db-root-password.txt
-    networks:
-      - Backend
-      - Frontend
+        secrets:
+            - db-root-password
+        environment:
+          PMA_HOST: mysqldb:3306
+          MYSQL_ROOT_PASSWORD: /run/secrets/db-root-password.txt
+        networks:
+          - Backend
+          - Frontend
   
-  # DRUPAL
-drupal:
-    image: drupal:8-apache
-    depends_on:
-      - mysqldb
-    ports:
-      - "2020:80"
-    volumes:
-      - /var/www/html/sites
-      - /var/www/html/profiles
-      - /var/www/html/themes
-      - /var/www/html/modules
-      - /var/www/html/private
+      # DRUPAL
+    drupal:
+        image: drupal:8-apache
+        depends_on:
+          - mysqldb
+        ports:
+          - "2020:80"
+        volumes:
+          - /var/www/html/sites
+          - /var/www/html/profiles
+          - /var/www/html/themes
+          - /var/www/html/modules
+          - /var/www/html/private
     
-    secrets:
-        - db-user
-        - db-password
-    environment:
-      MYSQL_DATABASE: DRUPAL
-      MYSQL_USER: /run/secrets/user.txt
-      MYSQL_PASSWORD: /run/secrets/db-password.txt
-    networks:
-      - Backend
-      - Frontend
-    deploy:
-      replicas: 3
+        secrets:
+            - db-user
+            - db-password
+        environment:
+          MYSQL_DATABASE: DRUPAL
+          MYSQL_USER: /run/secrets/user.txt
+          MYSQL_PASSWORD: /run/secrets/db-password.txt
+        networks:
+          - Backend
+          - Frontend
+        deploy:
+          replicas: 3
   
-  # VISUALIZER
-visualizer:
-    image: dockersamples/visualizer:stable
-    ports:
-      - "8080:8080"
-    stop_grace_period: 1m30s
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock"
-    networks:
-      - Backend
-      - Frontend
-    deploy:
-      placement:
-        constraints: [node.role == manager]
+      # VISUALIZER
+    visualizer:
+        image: dockersamples/visualizer:stable
+        ports:
+          - "8080:8080"
+        stop_grace_period: 1m30s
+        volumes:
+          - "/var/run/docker.sock:/var/run/docker.sock"
+        networks:
+          - Backend
+          - Frontend
+        deploy:
+          placement:
+            constraints: [node.role == manager]
     
-volumes: #volume tanımı yapıldı
-  db_data:
+    volumes: #volume tanımı yapıldı
+      db_data:
 
-networks: #network tanımı yapıldı
-  Backend:
-  Frontend:
+    networks: #network tanımı yapıldı
+      Backend:
+      Frontend:
 
-secrets:
-    db-user:
-        file: /home/eren/secrets/db-user.txt
-    db-password:
-        file: /home/eren/secrets/db-password.txt
-    db-root-password:
-        file: /home/eren/secrets/db-root-password.txt
+    secrets:
+        db-user:
+            file: /home/eren/secrets/db-user.txt
+        db-password:
+            file: /home/eren/secrets/db-password.txt
+        db-root-password:
+            file: /home/eren/secrets/db-root-password.txt
