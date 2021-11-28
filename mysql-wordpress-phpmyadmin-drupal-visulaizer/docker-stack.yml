@@ -40,8 +40,8 @@ services:
       - Frontend
     deploy:
         replicas: 5
-        placement:
-            constraints: [node.hostname == node3]
+        #placement:
+        #    constraints: [node.hostname == node3]
         restart_policy:
             condition: on-failure
         update_config:
