@@ -115,5 +115,5 @@ volumes: #volume tanımı yapıldı
   db_data:
 
 networks: #network tanımı yapıldı
-  Backend
-  Frontend
+  Backend:
+  Frontend:
