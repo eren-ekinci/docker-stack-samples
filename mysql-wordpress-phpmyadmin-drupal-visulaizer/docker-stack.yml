@@ -20,7 +20,6 @@ services:
       MYSQL_ROOT_PASSWORD: birikiuc123!
     networks:
       - Backend
-    restart: always
   
   # WORDPRESS
   wordpress:
@@ -55,14 +54,12 @@ services:
           reservations:
             cpus: '0.25'
             memory: 20M
-    restart: always
   
   # PHPMYADMIN
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
     depends_on:
       - mysqldb
-    restart: always
     ports:
       - '7080:80'
     environment:
@@ -94,7 +91,6 @@ services:
       - Frontend
     deploy:
       replicas: 3
-    restart: always
   
   # VISUALIZER
   visualizer:
