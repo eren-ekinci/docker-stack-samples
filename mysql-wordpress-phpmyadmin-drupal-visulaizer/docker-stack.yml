@@ -71,6 +71,7 @@ services:
       - mysqldb
     ports:
       - '7080:80'
+    
     secrets:
         - db-root-password
     environment:
