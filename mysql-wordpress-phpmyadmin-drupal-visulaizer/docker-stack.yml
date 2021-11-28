@@ -13,11 +13,17 @@ services:
             condition: on-failure
         placement:
             constraints: [node.hostname == node1]
+    secrets:
+        - db-user
+        - db-password
+        - db-root-password
+
     environment:
       MYSQL_DATABASE: wordpress
-      MYSQL_USER: sa
-      MYSQL_PASSWORD: birikiuc123!
-      MYSQL_ROOT_PASSWORD: birikiuc123!
+      MYSQL_USER: /run/secrets/db-user.txt
+      MYSQL_PASSWORD: /run/secrets/db-password.txt
+      MYSQL_ROOT_PASSWORD: /run/secrets/db-root-password.txt
+
     networks:
       - Backend
   
@@ -30,10 +36,13 @@ services:
       - /var/www/html
     ports:
       - '1010:80'
+    secrets:
+        - db-user
+        - db-password
     environment:
       WORDPRESS_DB_HOST: mysqldb:3306
-      WORDPRESS_DB_USER: sa
-      WORDPRESS_DB_PASSWORD: birikiuc123!
+      WORDPRESS_DB_USER: /run/secrets/db-user.txt
+      WORDPRESS_DB_PASSWORD: /run/secrets/db-password.txt
       WORDPRESS_DB_NAME: wordpress
     networks:
       - Backend
@@ -62,9 +71,11 @@ services:
       - mysqldb
     ports:
       - '7080:80'
+    secrets:
+        - db-password
     environment:
       PMA_HOST: mysqldb:3306
-      MYSQL_ROOT_PASSWORD: birikiuc123!
+      MYSQL_ROOT_PASSWORD: /run/secrets/db-password.txt
     networks:
       - Backend
       - Frontend
@@ -82,10 +93,13 @@ services:
       - /var/www/html/themes
       - /var/www/html/modules
       - /var/www/html/private
+    secrets:
+        - db-user
+        - db-password
     environment:
       MYSQL_DATABASE: DRUPAL
-      MYSQL_USER: sa
-      MYSQL_PASSWORD: birikiuc123!
+      MYSQL_USER: /run/secrets/user.txt
+      MYSQL_PASSWORD: /run/secrets/db-password.txt
     networks:
       - Backend
       - Frontend
@@ -113,3 +127,11 @@ volumes: #volume tanımı yapıldı
 networks: #network tanımı yapıldı
   Backend:
   Frontend:
+
+secrets:
+    db-user:
+        file: /home/eren/secrets/db-user.txt
+    db-password:
+        file: /home/eren/secrets/db-password.txt
+    db-root-password:
+        file: /home/eren/secrets/db-root-password.txt
