@@ -49,7 +49,7 @@ services:
             delay: 10s
         resources:
           limits:
-            cpus: '0.50'
+            cpus: '0.25'
             memory: 50M
           reservations:
             cpus: '0.25'
